@@ -12,20 +12,32 @@ public class TicketStockActor {
     if(quantity < 0)
       throw new RuntimeException("TicketStock quantity cannot be negative");
     else
-      return Behaviors.setup(context -> behavior(context, ticketId, quantity));
+      return Behaviors.setup(context -> available(context, ticketId, quantity));
   }
 
   // private: never accessed from outside the actor
-  private static Behavior<Message> behavior(ActorContext<Message> context, int ticketId, int quantity) {
+  private static Behavior<Message> available(ActorContext<Message> context, int ticketId, int quantity) {
     return Behaviors.receive(Message.class)
       .onMessage(TicketStockDecrement.class, message -> {
-        int decrementedQuantity = quantity - message.quantityDecrementedBy;
+        var decrementedQuantity = quantity - message.quantityDecrementedBy;
         if (decrementedQuantity < 0) {
           message.sender.tell("TicketStock cannot have a negative quantity");
           return Behaviors.same();
+        } else if (decrementedQuantity == 0){
+          return outOfStock(context, ticketId);
         } else {
-          return behavior(context, ticketId, decrementedQuantity);
+          return available(context, ticketId, decrementedQuantity);
         }
+      })
+      .build();
+  }
+
+  // private: never accessed from outside the actor
+  private static Behavior<Message> outOfStock(ActorContext<Message> context, int ticketId) {
+    return Behaviors.receive(Message.class)
+      .onMessage(TicketStockDecrement.class, message -> {
+        message.sender.tell("Ticket is out of stock");
+        return Behaviors.same();
       })
       .build();
   }
