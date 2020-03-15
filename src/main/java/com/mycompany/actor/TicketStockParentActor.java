@@ -20,6 +20,7 @@ public class TicketStockParentActor {
     ActorContext<Message> context,
     ActorRef<OrderParentActor.Message> orderParent,
     Map<String, ActorRef<TicketStockActor.Message>> children) {
+
     return Behaviors.receive(Message.class)
       .onMessage(CreateTicketStock.class, message -> {
         var id = UUID.randomUUID();
