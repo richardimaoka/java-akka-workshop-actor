@@ -24,9 +24,11 @@ public class TicketStockActor {
           message.sender.tell("TicketStock cannot have a negative quantity");
           return Behaviors.same();
         } else if (decrementedQuantity == 0){
+          orderParent.tell(new OrderParentActor.CreateOrder(message.ticketId, message.userId, message.quantityDecrementedBy, message.sender));
           return outOfStock(context, ticketId);
         } else {
-          return available(context, ticketId, decrementedQuantity);
+          orderParent.tell(new OrderParentActor.CreateOrder(message.ticketId, message.userId, message.quantityDecrementedBy, message.sender));
+          return available(context, orderParent, ticketId, decrementedQuantity);
         }
       })
       .build();
@@ -49,11 +51,13 @@ public class TicketStockActor {
 
   public static final class TicketStockDecrement implements Message {
     public final int ticketId;
+    public final int userId;
     public final int quantityDecrementedBy;
     public final ActorRef<String> sender;
 
-    public TicketStockDecrement(int ticketId, int quantityDecrementedBy, ActorRef<String> sender) {
+    public TicketStockDecrement(int ticketId, int userId, int quantityDecrementedBy, ActorRef<String> sender) {
       this.ticketId = ticketId;
+      this.userId = userId;
       this.quantityDecrementedBy = quantityDecrementedBy;
       this.sender = sender;
     }

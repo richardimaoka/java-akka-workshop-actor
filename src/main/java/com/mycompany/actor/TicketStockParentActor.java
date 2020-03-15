@@ -10,21 +10,22 @@ public class TicketStockParentActor {
    *  Actor Behaviors
    *******************************************************************************/
   // public: the only Behavior factory method accessed from outside the actor
-  public static Behavior<Message> create(int ticketId, int quantity){
+  public static Behavior<Message> create(ActorRef<OrderParentActor.Message> orderParent, int ticketId, int quantity){
     Map<String, ActorRef<TicketStockActor.Message>> children = Collections.emptyMap();
-    return Behaviors.setup(context -> behavior(context, children));
+    return Behaviors.setup(context -> behavior(context, orderParent, children));
   }
 
   // private: never accessed from outside the actor
   private static Behavior<Message> behavior(
     ActorContext<Message> context,
+    ActorRef<OrderParentActor.Message> orderParent,
     Map<String, ActorRef<TicketStockActor.Message>> children) {
     return Behaviors.receive(Message.class)
       .onMessage(CreateTicketStock.class, message -> {
         var id = UUID.randomUUID();
-        var child = context.spawn(TicketStockActor.create(message.ticketId, message.quantity), id.toString());
+        var child = context.spawn(TicketStockActor.create(orderParent, message.ticketId, message.quantity), id.toString());
         children.put(id.toString(), child);
-        return behavior(context, children);
+        return behavior(context, orderParent, children);
       })
       .build();
   }
