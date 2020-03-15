@@ -5,26 +5,8 @@ import akka.actor.typed.javadsl.*;
 
 public class InventoryActor {
   /********************************************************************************
-   *  Actor Messages
-   *******************************************************************************/
-  public interface Message {}
-
-  public static final class InventoryDecrement implements Message {
-    public final int ticketId;
-    public final int quantityDecrementedBy;
-    public final ActorRef<String> sender;
-
-    public InventoryDecrement(int ticketId, int quantityDecrementedBy, ActorRef<String> sender) {
-      this.ticketId = ticketId;
-      this.quantityDecrementedBy = quantityDecrementedBy;
-      this.sender = sender;
-    }
-  }
-
-  /********************************************************************************
    *  Actor Behaviors
    *******************************************************************************/
-
   // public: the only Behavior factory method accessed from outside the actor
   public static Behavior<Message> create(int ticketId, int quantity){
     if(quantity < 0)
@@ -47,4 +29,22 @@ public class InventoryActor {
       })
       .build();
   }
+
+  /********************************************************************************
+   *  Actor Messages
+   *******************************************************************************/
+  public interface Message {}
+
+  public static final class InventoryDecrement implements Message {
+    public final int ticketId;
+    public final int quantityDecrementedBy;
+    public final ActorRef<String> sender;
+
+    public InventoryDecrement(int ticketId, int quantityDecrementedBy, ActorRef<String> sender) {
+      this.ticketId = ticketId;
+      this.quantityDecrementedBy = quantityDecrementedBy;
+      this.sender = sender;
+    }
+  }
+
 }
