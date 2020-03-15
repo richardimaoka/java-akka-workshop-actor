@@ -5,7 +5,7 @@ import akka.actor.typed.javadsl.*;
 
 import java.util.*;
 
-public class InventoryParentActor {
+public class TicketStockParentActor {
   /********************************************************************************
    *  Actor Behaviors
    *******************************************************************************/
